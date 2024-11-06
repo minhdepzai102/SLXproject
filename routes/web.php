@@ -5,6 +5,13 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\MainController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\EditController;
+use App\Http\Controllers\Admin\SlideController;
+use App\Http\Controllers\User\ProductShopController;
+
+use Illuminate\Foundation\Auth\User;
 
 Route::get('admin/users/login', [LoginController::class, 'index'])->name('login');
 Route::post('admin/users/login/store', [LoginController::class, 'store']);
@@ -25,4 +32,41 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::post('update/{menu}', [MenuController::class, 'update'])->name('menus.update');
         Route::delete('destroy/{menu}', [MenuController::class, 'destroy'])->name('menus.destroy');
     });
+
+
+    #product
+    Route::prefix('products')->group(function () {
+        Route::get('/products/search', [ProductController::class, 'search']);
+        Route::get('list', [ProductController::class, 'index'])->name('products.index');
+        Route::get('add', [ProductController::class, 'create'])->name('products.add');
+        Route::post('store', [ProductController::class, 'store'])->name('products.store');
+        Route::get('edit/{product}', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('update/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('destroy/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    });
+
+    Route::prefix('user')->group(function(){
+        Route::get('index',[UserController::class,'index'])->name('user.index');
+        Route::get('shop',[ProductShopController::class,'index'])->name('user.shop');    
+    });
+    Route::prefix('edit')->group(function(){
+        Route::get('index',[EditController::class,'index'])->name('edit.index');
+    });
+    # SLIDE
+Route::prefix('slides')->group(function () {
+    
+    Route::get('index',[SlideController::class,'index'])->name('slide.index');
+    Route::get('add', [SlideController::class, 'create'])->name('slide.add'); // Show form to add a slide
+    Route::post('store', [SlideController::class, 'store'])->name('slide.store'); // Store a new slide
+    Route::get('edit/{slide}', [SlideController::class, 'edit'])->name('slide.edit'); // Show form to edit a slide
+    Route::put('update/{slide}', [SlideController::class, 'update'])->name('slide.update');
+
+    Route::delete('destroy/{slide}', [SlideController::class, 'destroy'])->name('slide.destroy'); // Delete a slide
 });
+
+   
+});  
+
+
+        
+

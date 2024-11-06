@@ -70,6 +70,22 @@
                         <a class="nav-link" href="{{ route('menus.index') }}">Category</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{route('products.index')}}">Product</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="{{ route('user.index') }}">Web</a>
+
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="{{ route('edit.index') }}">Edit</a>
+
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="{{ route('slide.index') }}">SlideBar</a>
+
+                    </li>
+                    
+                    <li class="nav-item">
                         <a class="nav-link" href="#">Users</a>
                     </li>
                     <li class="nav-item">

@@ -28,4 +28,9 @@ class Menu extends Model
         'active' => 'boolean', // Chuyển đổi active thành kiểu boolean
         'parent_id' => 'integer'
     ];
+    public function parentMenu()
+{
+    return $this->belongsTo(Menu::class, 'parent_id');
+}
+
 }

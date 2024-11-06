@@ -41,7 +41,8 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $menu->name }}</td>
-                        <td>{{ $menu->parent_id }}</td>
+                        <td>{{ $menu->parentMenu->name ?? 'Danh Mục Cha' }}</td>
+
                         <td>{{ $menu->description }}</td>
                         <td>{{ $menu->active ? 'Có' : 'Không' }}</td>
                         <td>
