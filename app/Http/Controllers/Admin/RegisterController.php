@@ -11,21 +11,31 @@ use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    // Hiển thị form đăng ký
+    // Display the registration form
     public function index()
     {
-        // Kiểm tra xem người dùng đã đăng nhập hay chưa
+        // Check if the user is logged in
         if (Auth::check()) {
-            return redirect()->route('admin')->with('info', 'Bạn đã đăng nhập.'); // Thông báo người dùng đã đăng nhập
+            // Get the authenticated user
+            $user = Auth::user();
+            
+            // Redirect based on the user's role
+            if ($user->role == 1) {
+                return redirect()->route('admin')->with('info', 'Bạn đã đăng nhập.'); // Redirect to admin page with info message
+            }
+
+            // If the role is not 1 (assumed to be a regular user)
+            return redirect()->route('user.index')->with('info', 'Bạn đã đăng nhập với vai trò người dùng.'); // Redirect to user page
         }
 
+        // If the user is not logged in, show the registration page
         return view('admin.register', ['title' => 'Đăng ký tài khoản admin']);
     }
 
-    // Xử lý đăng ký
+    // Handle the registration request
     public function store(Request $request)
     {
-        // Định nghĩa thông báo tùy chỉnh
+        // Custom error messages for validation
         $messages = [
             'name.required' => 'Tên là bắt buộc.',
             'email.required' => 'Email là bắt buộc.',
@@ -36,29 +46,35 @@ class RegisterController extends Controller
             'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
         ];
 
-        // Xác thực dữ liệu đầu vào
+        // Input validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed', // 'confirmed' đảm bảo khớp với trường 'password_confirmation'
+            'password' => 'required|string|min:6|confirmed', // 'confirmed' ensures it matches 'password_confirmation'
         ], $messages);
 
+        // Redirect back with errors if validation fails
         if ($validator->fails()) {
             return redirect()->back()
-                ->withErrors($validator) // Trả về toàn bộ validator để hiển thị thông báo chi tiết
+                ->withErrors($validator)
                 ->withInput();
         }
 
-        // Tạo người dùng mới
+        // Create a new user with a default role of 0 (regular user)
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Mã hóa mật khẩu
+            'password' => Hash::make($request->password), // Hash the password
+            'role' => 0, // Default role (change as per your application's logic)
         ]);
 
-        // Đăng nhập tự động sau khi đăng ký thành công
+        // Automatically log in the user after successful registration
         Auth::login($user);
 
-        return redirect()->route('admin')->with('success', 'Đăng ký thành công!');
+        // Redirect based on the user's role
+        if ($user->role == 1) {
+            return redirect()->route('admin')->with('success', 'Đăng ký thành công!');
+        }
+        return redirect()->route('user')->with('success', 'Đăng ký thành công!');
     }
 }

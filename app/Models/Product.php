@@ -18,7 +18,7 @@ class Product extends Model
         'price',
         'price_sale', // Added price_sale
         'active',
-        'thumb' // Added thumb for thumbnail
+        'thumb', // Added thumb for thumbnail
     ];
 
     // Định dạng kiểu dữ liệu
@@ -26,11 +26,30 @@ class Product extends Model
         'price' => 'decimal:2', // Đảm bảo giá có 2 chữ số thập phân
         'price_sale' => 'decimal:2', // Đảm bảo giá khuyến mãi có 2 chữ số thập phân
         'active' => 'boolean',    // Chuyển đổi sang kiểu boolean
+        'thumb' => 'array', // Ensure thumb is treated as an array
     ];
 
-    // Nếu bạn có quan hệ với model khác, ví dụ với Category
+    // Quan hệ với ProductImage
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    // Quan hệ với Menu (Danh mục)
     public function category()
     {
         return $this->belongsTo(Menu::class, 'menu_id'); // Relating to the Menu model
+    }
+
+    // Accessor for thumb (retrieves as array)
+    public function getThumbAttribute($value)
+    {
+        return json_decode($value, true); // Decode JSON string into an array
+    }
+
+    // Mutator for thumb (sets as JSON)
+    public function setThumbAttribute($value)
+    {
+        $this->attributes['thumb'] = json_encode($value); // Encode array to JSON
     }
 }
