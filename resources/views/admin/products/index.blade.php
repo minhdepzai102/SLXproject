@@ -187,14 +187,38 @@
                                 <input type="number" id="price_sale" name="price_sale" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="menu_id" class="form-label">Danh mục</label>
+                                <label for="quantity" class="form-label">Số lượng</label>
+                                <input type="number" id="quantity" name="quantity" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="size" class="form-label">Size</label>
+                                <input type="text" id="size" name="size" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="brand" class="form-label">Thương hiệu</label>
+                                <input type="text" id="brand" name="brand" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="menu_id" class="form-label">Danh mục cha</label>
                                 <select name="menu_id" id="menu_id" class="form-select" required>
-                                    <option value="">Chọn danh mục</option>
-                                    @foreach($menus as $menu)
+                                    <option value="">Chọn danh mục cha</option>
+                                    @foreach($parentMenus as $menu)
                                         <option value="{{ $menu->id }}">{{ $menu->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="child_menu_id" class="form-label">Danh mục con</label>
+                                <select name="child_menu_id" id="child_menu_id" class="form-select" disabled required>
+                                    <option value="">Chọn danh mục con</option>
+                                </select>
+                            </div>
+
+
                             <div class="mb-3">
                                 <label for="thumb" class="form-label">Hình thu nhỏ (Thumbnail)</label>
                                 <input type="file" id="thumb" name="thumb[]" class="form-control" accept="image/*"
@@ -218,6 +242,10 @@
                 </div>
             </div>
         </div>
+        <!-- Thêm jQuery trước các script khác sử dụng jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Nạp jQuery -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Nạp Bootstrap -->
 
         <!-- Edit Product Modal -->
         <!-- Edit Product Modal -->
@@ -258,14 +286,40 @@
                                     required>
                             </div>
                             <div class="mb-3">
-                                <label for="edit_menu_id" class="form-label">Danh mục</label>
-                                <select name="menu_id" id="edit_menu_id" class="form-select" required>
-                                    <option value="">Chọn danh mục</option>
-                                    @foreach($menus as $menu)
-                                        <option value="{{ $menu->id }}">{{ $menu->name }}</option>
+                                <label for="edit_quantity" class="form-label">Số lượng</label>
+                                <input type="number" id="edit_quantity" name="quantity" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_size" class="form-label">Size</label>
+                                <input type="text" id="edit_size" name="size" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_brand" class="form-label">Thương hiệu</label>
+                                <input type="text" id="edit_brand" name="brand" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_menu_id" class="form-label">Danh mục cha</label>
+                                <select name="chungtacuahientai123" id="edit_menu_id" class="form-select" required>
+                                    <option value="">Chọn danh mục cha</option>
+                                    @foreach($parentMenus as $menu)
+                                        <option value="{{ $menu->id }}" {{ old('menu_id', $product->menu_id) == $menu->id ? 'selected' : '' }}>
+                                            {{ $menu->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="edit_child_menu_id" class="form-label">Danh mục con</label>
+                                <select name="menu_id" id="edit_child_menu_id" class="form-select" required disabled>
+                                    <option value="">Chọn danh mục con</option>
+                                </select>
+                            </div>
+
+
                             <div class="mb-3">
                                 <label for="edit_thumb" class="form-label">Hình thu nhỏ (Thumbnail)</label>
                                 <input type="file" id="edit_thumb" name="thumb[]" class="form-control" accept="image/*"
@@ -298,23 +352,34 @@
 
 
         <!-- Optional JavaScript -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
 
-        </script>
+
+
 
         <script>
             const assetUrl = '{{ asset('public/storage') }}';
+
+            // Hàm mở modal và cập nhật các giá trị cho form
             function openEditModal(product) {
+                // Set values for product details
                 document.getElementById('edit_name').value = product.name;
                 document.getElementById('edit_description').value = product.description;
                 document.getElementById('edit_content').value = product.content;
                 document.getElementById('edit_price').value = product.price;
                 document.getElementById('edit_price_sale').value = product.price_sale;
-                document.getElementById('edit_menu_id').value = product.menu_id;
+                document.getElementById('edit_child_menu_id').value = product.menu_id; // Set parent menu
+                document.getElementById('edit_quantity').value = product.quantity;
+                document.getElementById('edit_size').value = product.size;
+                document.getElementById('edit_brand').value = product.brand;
+
+                // Set active status
                 document.getElementById(product.active == 1 ? 'edit_active' : 'edit_no_active').checked = true;
 
-                // Update the form action for product update
-                document.getElementById('editProductForm').action = `{{ route('products.update', '') }}/${product.id}`; // Set the route with product ID
+                // Set the form action for product update
+                document.getElementById('editProductForm').action = `{{ route('products.update', '') }}/${product.id}`;
+
+                // Set the child menu after setting the parent menu
+                setChildMenu(product.menu_id, product.child_menu_id);
 
                 // Display existing thumbnails
                 const currentThumbnails = document.getElementById('current-thumbnails');
@@ -322,17 +387,17 @@
 
                 if (product.thumb) {
                     const thumbs = JSON.parse(product.thumb);
-                    thumbs.forEach((thumb, index) => {
+                    thumbs.forEach((thumb) => {
                         const div = document.createElement('div');
                         div.classList.add('thumbnail-container');
-                        div.style.position = 'relative'; // Enable positioning of delete icon
+                        div.style.position = 'relative';
 
                         const img = document.createElement('img');
                         img.src = assetUrl + '/' + thumb;
                         img.alt = 'Thumbnail';
                         img.classList.add('img-thumbnail');
-                        img.style.width = '100px'; // Adjust size as needed
-                        img.style.marginRight = '10px'; // Space between images
+                        img.style.width = '100px';
+                        img.style.marginRight = '10px';
 
                         // Create delete icon
                         const deleteIcon = document.createElement('span');
@@ -343,7 +408,7 @@
                         deleteIcon.style.color = 'white';
                         deleteIcon.style.fontSize = '16px';
                         deleteIcon.style.cursor = 'pointer';
-                        deleteIcon.style.zIndex = '10'; // Ensure it's on top of the image
+                        deleteIcon.style.zIndex = '10';
                         deleteIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
                         deleteIcon.style.borderRadius = '50%';
                         deleteIcon.style.padding = '2px 5px';
@@ -354,37 +419,94 @@
 
                         // Add delete functionality to the "X" icon
                         deleteIcon.addEventListener('click', function () {
-                            // Remove the thumbnail from the preview
                             div.remove();
-
-                            // Remove from form data by adding to the hidden input
                             let removedThumbnails = document.getElementById('removed-thumbnails');
                             if (!removedThumbnails) {
-                                // Create a hidden input field to hold the removed image paths
                                 removedThumbnails = document.createElement('input');
                                 removedThumbnails.type = 'hidden';
-                                removedThumbnails.name = 'removed_thumbnails[]'; // Use an array format to store multiple values
+                                removedThumbnails.name = 'removed_thumbnails[]';
                                 document.getElementById('editProductForm').appendChild(removedThumbnails);
                             }
-
-                            // Add the removed thumbnail path to the hidden field
-                            const thumbValue = thumb; // The value that you want to remove from the data
-                            const inputValue = removedThumbnails.value ? removedThumbnails.value + ',' + thumbValue : thumbValue;
-                            removedThumbnails.value = inputValue;
+                            removedThumbnails.value = removedThumbnails.value ? removedThumbnails.value + ',' + thumb : thumb;
                         });
 
-                        // Append the thumbnail container to the display section
+                        // Append the thumbnail container
                         currentThumbnails.appendChild(div);
                     });
                 }
 
-                // Manually trigger the modal to show it
+                // Open the modal
                 var myModal = new bootstrap.Modal(document.getElementById('editProductModal'));
                 myModal.show();
             }
 
+            // Hàm để cập nhật danh mục con khi danh mục cha thay đổi
+            function setChildMenu(parentId, selectedChildMenuId) {
+                if (parentId) {
+                    // Kích hoạt dropdown danh mục con
+                    $('#edit_child_menu_id').prop('disabled', false);
 
+                    // Thực hiện AJAX để lấy danh mục con
+                    $.ajax({
+                        url: '{{ route('get.child.menus') }}',
+                        type: 'GET',
+                        data: { parent_id: parentId },
+                        success: function (data) {
+                            // Xóa các options cũ trong danh mục con
+                            $('#edit_child_menu_id').empty();
+                            $('#edit_child_menu_id').append('<option value="">Chọn danh mục con</option>');
 
+                            // Thêm các danh mục con mới vào dropdown và chọn danh mục con đúng
+                            $.each(data, function (index, menu) {
+                                $('#edit_child_menu_id').append('<option value="' + menu.id + '" ' + (selectedChildMenuId == menu.id ? 'selected' : '') + '>' + menu.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    // Nếu không có danh mục cha, disable và xóa các lựa chọn trong danh mục con
+                    $('#edit_child_menu_id').prop('disabled', true);
+                    $('#edit_child_menu_id').empty().append('<option value="">Chọn danh mục con</option>');
+                }
+            }
+
+            // Khi chọn danh mục cha, cập nhật danh mục con tương ứng
+            $('#edit_menu_id').on('change', function () {
+                var parentId = $(this).val(); // Lấy id của danh mục cha
+                setChildMenu(parentId, null); // Cập nhật danh mục con
+            });
+
+            // When a parent menu is selected
+            $('#menu_id').on('change', function () {
+                var parentId = $(this).val(); // Get selected parent ID
+
+                if (parentId) {
+                    // Enable child menu dropdown
+                    $('#child_menu_id').prop('disabled', false);
+
+                    // Make AJAX request to fetch child menus
+                    $.ajax({
+                        url: '{{ route('get.child.menus') }}',
+                        type: 'GET',
+                        data: { parent_id: parentId },
+                        success: function (data) {
+                            // Clear the current options in the child dropdown
+                            $('#child_menu_id').empty();
+
+                            // Add a default option
+                            $('#child_menu_id').append('<option value="">Chọn danh mục con</option>');
+
+                            // Populate the child dropdown with new options
+                            $.each(data, function (index, menu) {
+                                $('#child_menu_id').append('<option value="' + menu.id + '">' + menu.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    // If no parent is selected, disable the child dropdown
+                    $('#child_menu_id').prop('disabled', true);
+                    $('#child_menu_id').empty().append('<option value="">Chọn danh mục con</option>');
+                }
+            });
         </script>
 
 </body>

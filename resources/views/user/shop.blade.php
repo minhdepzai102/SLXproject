@@ -88,20 +88,19 @@ https://templatemo.com/tm-559-zay-shop
         <div class="w-100 d-flex justify-content-between">
             <div>
                 <i class="fa fa-envelope mx-2"></i>
-                <a class="navbar-sm-brand text-light text-decoration-none"
-                    href="mailto:info@company.com">info@company.com</a>
+                <a class="navbar-sm-brand text-light text-decoration-none" href="mailto:{{ $shopDetails->email ?? 'info@company.com' }}">
+                    {{ $shopDetails->email ?? 'info@company.com' }}
+                </a>
                 <i class="fa fa-phone mx-2"></i>
-                <a class="navbar-sm-brand text-light text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                <a class="navbar-sm-brand text-light text-decoration-none" href="tel:{{ $shopDetails->phone ?? '010-020-0340' }}">
+                    {{ $shopDetails->phone ?? '010-020-0340' }}
+                </a>
             </div>
             <div>
-                <a class="text-light" href="https://fb.com/templatemo" target="_blank" rel="sponsored"><i
-                        class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
-                <a class="text-light" href="https://www.instagram.com/" target="_blank"><i
-                        class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
-                <a class="text-light" href="https://twitter.com/" target="_blank"><i
-                        class="fab fa-twitter fa-sm fa-fw me-2"></i></a>
-                <a class="text-light" href="https://www.linkedin.com/" target="_blank"><i
-                        class="fab fa-linkedin fa-sm fa-fw"></i></a>
+                <a class="text-light" href="{{ $shopDetails->facebook ?? '#' }}" target="_blank"><i class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
+                <a class="text-light" href="{{ $shopDetails->instagram ?? '#' }}" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
+                <a class="text-light" href="{{ $shopDetails->twitter ?? '#' }}" target="_blank"><i class="fab fa-twitter fa-sm fa-fw me-2"></i></a>
+                <a class="text-light" href="{{ $shopDetails->linkedin ?? '#' }}" target="_blank"><i class="fab fa-linkedin fa-sm fa-fw"></i></a>
             </div>
         </div>
     </div>
@@ -114,25 +113,7 @@ https://templatemo.com/tm-559-zay-shop
 <!-- Close Header -->
 
 <!-- Modal -->
-<div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="w-100 pt-1 mb-5 text-right">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form action="" method="get" class="modal-content modal-body border-0 p-0">
-            <div class="input-group mb-2">
-                <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
-                <button type="submit" class="input-group-text bg-success text-light">
-                    <i class="fa fa-fw fa-search text-white"></i>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-
+@include('user.modalsearch');
 <!-- Start Content -->
 <div class="container py-5">
     <div class="row">
@@ -195,55 +176,56 @@ https://templatemo.com/tm-559-zay-shop
             </div>
             <div class="row">
                 @foreach ($products as $product)
-                    <div class="col-md-4">
-                        <div class="card mb-4 product-wap rounded-0">
-                            <div class="card rounded-0">
-                                   @php
-                            $thumbs = json_decode($product->thumb); // Giải mã JSON từ mảng hình ảnh
-                        @endphp
-                                 @if($thumbs && count($thumbs) > 0)
-                            <img class="img-fluid product-img" src="{{ asset('public/storage/' . $thumbs[0]) }}">
-                            @endif
-                               
+                                <div class="col-md-4">
+                                    <div class="card mb-4 product-wap rounded-0">
+                                        <div class="card rounded-0">
+                                            @php
+                                                $thumbs = json_decode($product->thumb); // Giải mã JSON từ mảng hình ảnh
+                                            @endphp
+                                            @if($thumbs && count($thumbs) > 0)
+                                                <img class="img-fluid product-img" src="{{ asset('public/storage/' . $thumbs[0]) }}">
+                                            @endif
 
-                                <div
-                                    class="card-img-overlay rounded-0 product-overlay d-flex align-items-center justify-content-center">
-                                    <ul class="list-unstyled">
-                                        <li><a class="btn btn-success text-white" href="shop-single.html"><i
-                                                    class="far fa-heart"></i></a></li>
-                                        <a class="btn btn-success text-white mt-2"
-                                            href="{{ route('product.single', $product->id) }}">
-                                            <i class="far fa-eye"></i>
-                                        </a>
 
-                                        <li><a class="btn btn-success text-white mt-2" href="shop-single.html"><i
-                                                    class="fas fa-cart-plus"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <p>{{ $product->name }}</p>
-                                @if($product->price_sale && $product->price_sale != $product->price)
-                                    <!-- Sale Price with Discount -->
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-muted" style="text-decoration: line-through;">
-                                            {{ number_format($product->price, 0, ',', '.') }} VND
-                                        </p>
-                                        <p class="text-success">
-                                            {{ round(((($product->price - $product->price_sale) / $product->price) * 100), 0) }}%
-                                            OFF
-                                        </p>
+                                            <div
+                                                class="card-img-overlay rounded-0 product-overlay d-flex align-items-center justify-content-center">
+                                                <ul class="list-unstyled">
+                                                    <li><a class="btn btn-success text-white" href="shop-single.html"><i
+                                                                class="far fa-heart"></i></a></li>
+                                                    <a class="btn btn-success text-white mt-2"
+                                                        href="{{ route('product.single', $product->id) }}">
+                                                        <i class="far fa-eye"></i>
+                                                    </a>
+
+                                                    <li><a class="btn btn-success text-white mt-2" href="shop-single.html"><i
+                                                                class="fas fa-cart-plus"></i></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>{{ $product->name }}</p>
+                                            @if($product->price_sale && $product->price_sale != $product->price)
+                                                <!-- Sale Price with Discount -->
+                                                <div class="d-flex justify-content-between">
+                                                    <p class="text-muted" style="text-decoration: line-through;">
+                                                        {{ number_format($product->price, 0, ',', '.') }} VND
+                                                    </p>
+                                                    <p class="text-success">
+                                                        {{ round(((($product->price - $product->price_sale) / $product->price) * 100), 0) }}%
+                                                        OFF
+                                                    </p>
+                                                </div>
+                                                <p class="text-danger h5">
+                                                    {{ number_format($product->price_sale, 0, ',', '.') }} VND
+                                                </p>
+                                            @else
+                                                <!-- Regular Price -->
+                                                <p class="text-left mb-0">{{ number_format($product->price, 0, ',', '.') }} VND</p>
+
+                                            @endif
+                                        </div>
                                     </div>
-                                    <p class="text-danger h5">
-                                        {{ number_format($product->price_sale, 0, ',', '.') }} VND
-                                    </p>
-                                @else
-                                    <!-- Regular Price -->
-                                    <p class="text-center mb-0">{{ number_format($product->price, 0, ',', '.') }} VND</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+                                </div>
                 @endforeach
             </div>
         </div>
@@ -473,11 +455,11 @@ https://templatemo.com/tm-559-zay-shop
 <!-- End Footer -->
 
 <!-- Start Script -->
-<script src="assets/js/jquery-1.11.0.min.js"></script>
-<script src="assets/js/jquery-migrate-1.2.1.min.js"></script>
-<script src="assets/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/templatemo.js"></script>
-<script src="assets/js/custom.js"></script>
+<script src="{{ asset('resources/views/user/assets/js/jquery-1.11.0.min.js')}}"></script>
+<script src="{{ asset('resources/views/user/assets/js/jquery-migrate-1.2.1.min.js')}}"></script>
+<script src="{{ asset('resources/views/user/assets/js/bootstrap.bundle.min.js')}}"></script>
+<script src="{{ asset('resources/views/user/assets/js/templatemo.js')}}"></script>
+<script src="{{ asset('resources/views/user/assets/js/custom.js')}}"></script>
 <!-- End Script -->
 </body>
 

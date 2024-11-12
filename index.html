@@ -1,0 +1,10 @@
+<div class="product-card">
+    <img src="${product.product_image}" alt="${product.name}" class="img-fluid">
+    <div>
+        <p><strong>${product.name}</strong></p>
+        <p class="price">
+            <span class="${product.price_sale ? 'line-through' : ''}">${product.price} VND</span>
+            ${product.price_sale ? `<span style="color: red;">${product.price_sale} VND</span>` : ''}
+        </p>
+    </div>
+</div>

@@ -9,6 +9,10 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Admin\EditController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\User\ProductShopController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\Admin\ShopDetailController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\CartController;
 
 use Illuminate\Foundation\Auth\User;
 
@@ -42,11 +46,14 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('edit/{product}', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('update/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('destroy/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+        Route::get('/get-child-menus', [ProductController::class, 'getChildMenus'])->name('get.child.menus');
     });
 
-   
+
     Route::prefix('edit')->group(function () {
         Route::get('index', [EditController::class, 'index'])->name('edit.index');
+        Route::put('/shop-details/edit', [ShopDetailController::class, 'edit'])->name('shop-details.edit');
+        Route::post('/shop-details/update', [ShopDetailController::class, 'update'])->name('shop-details.update');
     });
     # SLIDE
     Route::prefix('slides')->group(function () {
@@ -60,7 +67,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::delete('destroy/{slide}', [SlideController::class, 'destroy'])->name('slide.destroy'); // Delete a slide
     });
 
-    
+
 });
 
 Route::prefix('user')->group(function () {
@@ -70,7 +77,17 @@ Route::prefix('user')->group(function () {
     Route::get('shop/all', [ProductShopController::class, 'allProducts'])->name('shop.all');
     Route::get('product/{id}', [ProductShopController::class, 'show'])->name('product.single');
     Route::post('logout', [LoginController::class, 'logout'])->name('user.logout');
+    Route::post('/products/{productId}/rate', [RatingController::class, 'rate'])->name('products.rate');
+    Route::get('api/products/search', [ProductController::class, 'liveSearch'])->name('api.products.search');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
 
 });
+Route::post('/chat/send', [MessageController::class, 'sendMessage']);
+
+// Route lấy lịch sử tin nhắn
+Route::get('/chat/messages', [MessageController::class, 'getMessages']);
 
 

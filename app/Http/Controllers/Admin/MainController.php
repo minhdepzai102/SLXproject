@@ -10,7 +10,7 @@ class MainController extends Controller
     public function index(Request $request)
     {
         // Kiểm tra nếu người dùng chưa đăng nhập hoặc không phải là admin
-        if (!$request->user() || $request->user()->role !== '1') {
+        if (!$request->user() || $request->user()->role != '1') {
             // Nếu không phải admin, chuyển hướng đến trang khác (ví dụ trang home)
             return redirect()->route('user.index');
 

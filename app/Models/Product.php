@@ -19,7 +19,11 @@ class Product extends Model
         'price_sale', // Added price_sale
         'active',
         'thumb', // Added thumb for thumbnail
+        'quantity', // Added quantity
+        'size', // Added size
+        'brand', // Added brand
     ];
+    
 
     // Định dạng kiểu dữ liệu
     protected $casts = [
@@ -52,4 +56,16 @@ class Product extends Model
     {
         $this->attributes['thumb'] = json_encode($value); // Encode array to JSON
     }
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    // Phương thức để tính trung bình số sao
+    public function averageRating()
+    {
+        // Tính trung bình số sao từ các đánh giá
+        return $this->ratings->avg('rating') ?: 0; // Trả về 0 nếu không có đánh giá
+    }
+    
 }

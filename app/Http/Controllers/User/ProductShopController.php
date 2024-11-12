@@ -5,7 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Product;
-
+use App\Models\ShopDetail;
+use App\Models\Message;
 class ProductShopController extends Controller
 {
     public function index(Request $request)
@@ -28,10 +29,10 @@ class ProductShopController extends Controller
                     $products = $products->orderBy('name', 'desc');
                     break;
                 case 'price_low_to_high':
-                    $products = $products->orderBy('price', 'asc');
+                    $products = $products->orderByRaw('COALESCE(price_sale, price) asc');
                     break;
                 case 'price_high_to_low':
-                    $products = $products->orderBy('price', 'desc');
+                    $products = $products->orderByRaw('COALESCE(price_sale, price) desc');
                     break;
                 default:
                     break;
@@ -43,8 +44,9 @@ class ProductShopController extends Controller
 
         // Fetch all active menus (categories)
         $menus = Menu::where('active', 1)->get();
+        $shopDetails = ShopDetail::first();
 
-        return view('user.shop', compact('products', 'menus'));
+        return view('user.shop', compact('products', 'menus', 'shopDetails'));
     }
     public function filterByCategory($category)
     {
@@ -90,21 +92,58 @@ class ProductShopController extends Controller
     {
         // Lấy sản phẩm theo ID
         $product = Product::findOrFail($id);
+        $sizes = explode(',', $product->size); // Tách chuỗi thành mảng
+        // Lấy menu của sản phẩm hiện tại
+        $menuId = $product->menu_id;
 
-        // Trả về view với thông tin sản phẩm
-        return view('user.shop-single', compact('product'));
+        // Lọc các sản phẩm cùng menu và loại bỏ sản phẩm hiện tại
+        $relatedProducts = Product::where('menu_id', $menuId)
+            ->where('id', '!=', $id)  // Loại bỏ sản phẩm hiện tại
+            ->get();
+        $shopDetails = ShopDetail::first();
+
+        // Trả về view với thông tin sản phẩm và các sản phẩm liên quan
+        return view('user.shop-single', compact('product', 'relatedProducts', 'shopDetails','sizes'));
     }
+
+
     public function showProductDetail($id)
-{
-    // Lấy sản phẩm chính dựa trên id
-    $product = Product::find($id);
+    {
+        // Lấy sản phẩm chính dựa trên id
+        $product = Product::find($id);
 
-    // Lấy danh sách sản phẩm ngẫu nhiên khác để hiển thị thêm
-    $additionalProducts = Product::inRandomOrder()->take(4)->get(); // lấy 4 sản phẩm ngẫu nhiên
+        // Lấy danh sách sản phẩm ngẫu nhiên khác để hiển thị thêm
+        $additionalProducts = Product::inRandomOrder()->take(4)->get(); // lấy 4 sản phẩm ngẫu nhiên
 
-    return view('product-detail', compact('product', 'additionalProducts'));
-}
+        return view('product-detail', compact('product', 'additionalProducts'));
+    }
+    public function sendMessage(Request $request)
+    {
+        $request->validate([
+            'message' => 'required|string|max:255',
+            'sender_id' => 'required|integer',
+            'sender_type' => 'required|in:user,admin',
+        ]);
 
+        // Lưu tin nhắn vào cơ sở dữ liệu
+        $message = Message::create([
+            'message' => $request->input('message'),
+            'sender_id' => $request->input('sender_id'),
+            'sender_type' => $request->input('sender_type'),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $message,
+        ]);
+    }
+
+    // Lấy lịch sử tin nhắn
+    public function getChatHistory()
+    {
+        $messages = Message::orderBy('created_at')->get();
+        return response()->json($messages);
+    }
 }
 
 

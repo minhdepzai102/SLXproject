@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Http\Services\Product\ProductService;
 use Illuminate\Http\Request;
+use App\Models\ShopDetail;
 
 class UserController extends Controller
 {
@@ -30,8 +31,9 @@ class UserController extends Controller
         } else {
             $products = $this->productService->getAll(); // Default to all products if no menu is selected
         }
+        $shopDetails = ShopDetail::first();
 
         // Pass menus and products data to the view
-        return view('user.index', compact('menus', 'products'));
+        return view('user.index', compact('menus', 'products','shopDetails'));
     }
 }

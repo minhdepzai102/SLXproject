@@ -1,32 +1,44 @@
 <nav class="navbar navbar-expand-lg navbar-light shadow">
     <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand text-success logo h1 align-self-center" href="{{ route('user.index') }}">
-            Zay
+        {{ $shopDetails->name ?? 'Error' }}
         </a>
-<style>
-    .logout-btn {
-    color: #333; /* Dark text color */
-    background-color: transparent; /* Transparent background to blend with dropdown */
-    border: none; /* Remove any border */
-    padding: 8px 20px; /* Padding to make it consistent with other dropdown items */
-    text-align: left; /* Align text to the left */
-    width: 100%; /* Full width to make it span the entire dropdown */
-    font-size: 16px; /* Adjust font size for better readability */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover */
-}
+        <style>
+            .logout-btn {
+                color: #333;
+                /* Dark text color */
+                background-color: transparent;
+                /* Transparent background to blend with dropdown */
+                border: none;
+                /* Remove any border */
+                padding: 8px 20px;
+                /* Padding to make it consistent with other dropdown items */
+                text-align: left;
+                /* Align text to the left */
+                width: 100%;
+                /* Full width to make it span the entire dropdown */
+                font-size: 16px;
+                /* Adjust font size for better readability */
+                transition: background-color 0.3s ease, color 0.3s ease;
+                /* Smooth transition for hover */
+            }
 
-.logout-btn:hover {
-    background-color: #f8f9fa; /* Light background on hover */
-    color: #007bff; /* Blue text color on hover */
-    cursor: pointer; /* Pointer cursor */
-}
+            .logout-btn:hover {
+                background-color: #f8f9fa;
+                /* Light background on hover */
+                color: #007bff;
+                /* Blue text color on hover */
+                cursor: pointer;
+                /* Pointer cursor */
+            }
 
-.logout-btn:focus {
-    outline: none; /* Remove focus outline */
-    box-shadow: none; /* No shadow on focus */
-}
-
-</style>
+            .logout-btn:focus {
+                outline: none;
+                /* Remove focus outline */
+                box-shadow: none;
+                /* No shadow on focus */
+            }
+        </style>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
             data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false"
             aria-label="Toggle navigation">
@@ -64,7 +76,7 @@
                     data-bs-target="#templatemo_search">
                     <i class="fa fa-fw fa-search text-dark mr-2"></i>
                 </a>
-                <a class="nav-icon position-relative text-decoration-none" href="#">
+                <a class="nav-icon position-relative text-decoration-none" href="{{route('cart.index')}}">
                     <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
                     <span
                         class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
@@ -78,18 +90,32 @@
                             <i class="fa fa-fw fa-user text-dark mr-3"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                            <!-- Hiển thị nút Admin nếu người dùng là admin -->
+                            @if(Auth::user()->role == 1)
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin') }}">Admin</a>
+                                </li>
+                            @endif
+                            <!-- Logout Link -->
+                            <li>
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    Logout
+                                </a>
+                            </li>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
-                                <button type="submit" class="nav-link btn btn-link logout-btn">Logout</button>
                             </form>
-
                         </ul>
+
                     </div>
                 @else
+                    <!-- Liên kết tới trang đăng nhập -->
                     <a class="nav-icon position-relative text-decoration-none" href="{{ route('login') }}">
                         <i class="fa fa-fw fa-user text-dark mr-3"></i>
                     </a>
                 @endif
+
             </div>
         </div>
     </div>
